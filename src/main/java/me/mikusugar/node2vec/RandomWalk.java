@@ -2,6 +2,7 @@ package me.mikusugar.node2vec;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import me.mikusugar.common.AliasSampling;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

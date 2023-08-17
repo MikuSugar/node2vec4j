@@ -1,4 +1,4 @@
-package me.mikusugar.node2vec;
+package me.mikusugar.common;
 
 import org.junit.Test;
 import org.slf4j.Logger;

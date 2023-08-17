@@ -1,4 +1,4 @@
-package me.mikusugar.node2vec;
+package me.mikusugar.common;
 
 import java.util.Arrays;
 import java.util.LinkedList;

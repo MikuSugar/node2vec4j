@@ -1,5 +1,7 @@
 package me.mikusugar.common;
 
+import com.google.common.base.Preconditions;
+
 import java.util.stream.IntStream;
 
 /**
@@ -61,5 +63,16 @@ public class VectorUtils
     public static double wordVectorAnalogyScore(double[] vA, double[] vB, double[] vC, double[] vD)
     {
         return calculateCosineSimilarity(subtractVectors(vA, vB), subtractVectors(vC, vD));
+    }
+
+    public static double dot(double[] vec1, double[] vec2)
+    {
+        Preconditions.checkArgument(vec1.length == vec2.length);
+        double f = 0d;
+        for (int j = 0; j < vec1.length; j++)
+        {
+            f += vec1[j] * vec2[j];
+        }
+        return f;
     }
 }

@@ -7,7 +7,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import me.mikusugar.node2vec.AliasSampling;
+import me.mikusugar.common.AliasSampling;
+import me.mikusugar.common.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +123,7 @@ public abstract class Word2Vec
 
     protected double getGradient(int input, int target, int label)
     {
-        double f = dot(syn0[input], syn1[target]);
+        double f = VectorUtils.dot(syn0[input], syn1[target]);
         double g;
         if (f > MAX_EXP)
         {
@@ -137,17 +138,6 @@ public abstract class Word2Vec
             g = (label - expTable[(int)((f + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))]) * alpha;
         }
         return g;
-    }
-
-    protected double dot(double[] vec1, double[] vec2)
-    {
-        Preconditions.checkArgument(vec1.length == vec2.length);
-        double f = 0d;
-        for (int j = 0; j < vec1.length; j++)
-        {
-            f += vec1[j] * vec2[j];
-        }
-        return f;
     }
 
     protected void readVocab(File file) throws IOException
