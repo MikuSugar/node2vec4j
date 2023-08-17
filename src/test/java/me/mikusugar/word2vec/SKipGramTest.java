@@ -2,9 +2,12 @@ package me.mikusugar.word2vec;
 
 import me.mikusugar.HelpTestUtils;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description
@@ -15,8 +18,10 @@ public class SKipGramTest
 {
     private final static String corpusModelName = "corpus.emb";
 
+    private static final Logger logger = LoggerFactory.getLogger(SkipGram.class);
+
     @Test
-    public void fitCorpus() throws Exception
+    public void testFitAndSaveBinaryModel() throws Exception
     {
         final String corpusFilePath = HelpTestUtils.getResourcePath() + "/corpus.txt";
         final SkipGram skipGram = new SkipGram();
@@ -28,21 +33,31 @@ public class SKipGramTest
     }
 
     @Test
-    public void ficCorpusResult() throws IOException
+    public void testClosesWords() throws IOException
+    {
+        final LoadModel model = loadModelFromCorpus();
+        final List<LoadModel.WordEntry> result = model.closestWords("邓小平");
+        logger.info("邓小平 closesWords：" + result);
+        assert result.stream().map(v -> v.value).collect(Collectors.toSet()).contains("毛泽东");
+    }
+
+    @Test
+    public void testAnalogy() throws IOException
+    {
+        final LoadModel model = loadModelFromCorpus();
+        final List<LoadModel.WordEntry> analogy = model.analogy("毛泽东", "毛泽东思想", "邓小平");
+        logger.info("毛泽东->毛泽东思想 analogy 邓小平->{}", analogy);
+        assert analogy.stream().map(v -> v.value).collect(Collectors.toSet()).contains("邓小平理论");
+
+        final List<LoadModel.WordEntry> analogy1 = model.analogy("女人", "女儿", "男人");
+        logger.info("女人->女儿 analogy 男人->{}", analogy1);
+        assert analogy1.stream().map(v -> v.value).collect(Collectors.toSet()).contains("儿子");
+    }
+
+    private static LoadModel loadModelFromCorpus() throws IOException
     {
         LoadModel model = new LoadModel();
         model.loadBinaryMode(corpusModelName);
-        System.out.println(model.closestWords("中国"));
-        System.out.println("邓小平：" + model.closestWords("邓小平"));
-        System.out.println("魔术队:" + model.closestWords("魔术队"));
-        System.out.println("过年：" + model.closestWords("过年"));
-        System.out.println("香港" + " 澳门：" + model.closestWords(Arrays.asList("香港", "澳门")));
-        System.out.println("###########################");
-        System.out.println(model.analogy("毛泽东", "邓小平", "毛泽东思想"));
-        System.out.println("###########################");
-        System.out.println(model.analogy("女人", "女儿", "男人"));
-        System.out.println("###########################");
-        System.out.println(model.analogy("北京", "中国", "巴黎"));
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~");
+        return model;
     }
 }
