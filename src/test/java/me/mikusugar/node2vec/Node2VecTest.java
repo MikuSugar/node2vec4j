@@ -23,7 +23,7 @@ public class Node2VecTest
     {
         final String path = HelpTestUtils.getResourcePath() + "/karate.edgelist";
         final Graph graph = ParseUtils.edgeListFile2Graph(path, false);
-        Node2VecLearn learn = new Node2VecLearn(1, 1, 80, 10, 128, 10, 1e-3, 0.025, 10, 10);
+        Node2VecLearn learn = new Node2VecLearn(1, 1, 80, 10, 128, 10, 1e-3, 0.025, 10, 10, isSkipGram);
         learn.setNegative(10);
         learn.lean(graph);
 

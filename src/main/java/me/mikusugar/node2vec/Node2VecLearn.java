@@ -1,6 +1,7 @@
 package me.mikusugar.node2vec;
 
 import com.google.common.base.Preconditions;
+import me.mikusugar.word2vec.CBOW;
 import me.mikusugar.word2vec.SkipGram;
 import me.mikusugar.word2vec.Word2Vec;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author mikusugar
@@ -55,14 +55,14 @@ public class Node2VecLearn
 
     private Word2Vec word2vec;
 
-    private Map<Integer, double[]> nodeMap;
-
     private int MAX_EAP = 6;
 
     private int negative = 10;
 
+    private boolean isSkipGram = true;
+
     public Node2VecLearn(double p, double q, int walkLength, int numWalks, int layerSize, int window, double sample,
-            double alpha, int MAX_EAP, int negative)
+            double alpha, int MAX_EAP, int negative, boolean isSkipGram)
     {
         this.p = p;
         this.q = q;
@@ -74,15 +74,29 @@ public class Node2VecLearn
         this.alpha = alpha;
         this.MAX_EAP = MAX_EAP;
         this.negative = negative;
+        this.isSkipGram = isSkipGram;
 
-        this.word2vec = new SkipGram();
+        initWord2Vec(layerSize, window, sample, alpha, MAX_EAP, negative, isSkipGram);
+        check();
+    }
+
+    private void initWord2Vec(int layerSize, int window, double sample, double alpha, int MAX_EAP, int negative,
+            boolean isSkipGram)
+    {
+        if (isSkipGram)
+        {
+            this.word2vec = new SkipGram();
+        }
+        else
+        {
+            this.word2vec = new CBOW();
+        }
         this.word2vec.setLayerSize(layerSize);
         this.word2vec.setWindow(window);
         this.word2vec.setSample(sample);
         this.word2vec.setAlpha(alpha);
         this.word2vec.setMAX_EXP(MAX_EAP);
         this.word2vec.setNegative(negative);
-        check();
     }
 
     private void check()
@@ -184,5 +198,11 @@ public class Node2VecLearn
     {
         this.negative = negative;
         this.word2vec.setNegative(negative);
+    }
+
+    public void setSkipGram(boolean skipGram)
+    {
+        isSkipGram = skipGram;
+        initWord2Vec(layerSize, window, sample, alpha, MAX_EAP, negative, isSkipGram);
     }
 }
