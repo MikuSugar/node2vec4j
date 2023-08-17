@@ -48,8 +48,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>${maven.compiler.target}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -60,11 +60,6 @@
                             jar-with-dependencies
                         </descriptorRef>
                     </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.ansj.vec.Learn</mainClass>
-                        </manifest>
-                    </archive>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
