@@ -1,0 +1,11 @@
+.classpath
+.project
+.settings/
+.DS_Store
+/bin
+.git
+/target/
+*.bin
+*.emb
+*.vec
+.idea
