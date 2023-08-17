@@ -149,7 +149,7 @@ public class RandomWalk
 
     private int getNextStep(int src, int dst)
     {
-        Map<Integer, AliasSampling> srcAliasMap = aliasEdges.computeIfAbsent(src, k -> new Int2ObjectOpenHashMap<>());
+        Int2ObjectMap<AliasSampling> srcAliasMap = aliasEdges.computeIfAbsent(src, k -> new Int2ObjectOpenHashMap<>());
         AliasSampling aliasSampling = srcAliasMap.get(dst);
         if (aliasSampling == null)
         {
