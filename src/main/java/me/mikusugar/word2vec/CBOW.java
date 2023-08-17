@@ -1,14 +1,6 @@
 package me.mikusugar.word2vec;
 
-import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * @description CBOW
@@ -17,49 +9,9 @@ import java.io.IOException;
  */
 public class CBOW extends Word2Vec
 {
-    private static final Logger logger = LoggerFactory.getLogger(CBOW.class);
 
     @Override
-    public void fitFile(String filePath, int threads) throws Exception
-    {
-        File file = new File(filePath);
-        validateInputs(threads, file);
-
-        createExpTable();
-        readVocab(file);
-        initNet();
-        initNegative();
-        trainModel(file, threads);
-
-    }
-
-    private void trainModel(File file, int threads) throws IOException
-    {
-        //TODO 多线程支持
-        Preconditions.checkArgument(threads == 1, "Does not support multithreading.");
-        final long startTime = System.currentTimeMillis();
-        this.alpha = startingAlpha;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file)))
-        {
-            wordCount.set(0);
-            lastWordCount = 0;
-            wordCountActual = 0;
-            while (br.ready())
-            {
-                updateLearRate();
-                final String line = br.readLine();
-                tranLine(line);
-            }
-            logger.info("Vocab size: " + word2idx.size());
-            logger.info("Words in train file: " + trainWordsCount);
-            logger.info("success train over! take time:{}ms.", System.currentTimeMillis() - startTime);
-
-        }
-
-    }
-
-    private void tranLine(String line)
+    protected void tranLine(String line)
     {
         String[] strs = line.split("[\\s　]+");
         wordCount.addAndGet(strs.length);
@@ -68,18 +20,6 @@ public class CBOW extends Word2Vec
         {
             cbow(inputWordIdx, sentence, random.nextInt(window));
         }
-    }
-
-    public boolean checkNaN(double[] v)
-    {
-        for (double d : v)
-        {
-            if (Double.isNaN(d))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void cbow(int inputWordIdx, IntList sentence, int b)

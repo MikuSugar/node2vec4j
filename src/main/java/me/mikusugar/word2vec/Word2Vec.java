@@ -16,6 +16,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -183,7 +186,18 @@ public abstract class Word2Vec
         }
     }
 
-    public abstract void fitFile(String filePath, int threads) throws Exception;
+    public void fitFile(String filePath, int threads) throws Exception
+    {
+        logger.info("fit file:{},threads:{}.", filePath, threads);
+        File file = new File(filePath);
+        validateInputs(threads, file);
+
+        createExpTable();
+        readVocab(file);
+        initNet();
+        initNegative();
+        trainModel(file, threads);
+    }
 
     protected void initNet()
     {
@@ -296,4 +310,52 @@ public abstract class Word2Vec
         Preconditions.checkArgument(threads >= 1);
     }
 
+    protected abstract void tranLine(String line);
+
+    protected static void shutdownThreadPoolExecutor(ThreadPoolExecutor executor) throws InterruptedException
+    {
+        executor.shutdown();
+        // 等待所有任务执行完成
+        //noinspection ResultOfMethodCallIgnored
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        logger.info("shutdown thread pool success.");
+    }
+
+    protected void resetWordCount()
+    {
+        wordCount.set(0);
+        lastWordCount = 0;
+        wordCountActual = 0;
+    }
+
+    protected static ThreadPoolExecutor createThreadPoolExecutor(int threads)
+    {
+        logger.info("create thread poll threads:{}.", threads);
+        return new ThreadPoolExecutor(threads, threads, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<>(threads * 3),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    protected void trainModel(File file, int threads) throws IOException, InterruptedException
+    {
+        final long startTime = System.currentTimeMillis();
+        this.alpha = startingAlpha;
+
+        final ThreadPoolExecutor executor = createThreadPoolExecutor(threads);
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file)))
+        {
+            resetWordCount();
+            while (br.ready())
+            {
+                updateLearRate();
+                final String line = br.readLine();
+                executor.execute(() -> tranLine(line));
+            }
+            shutdownThreadPoolExecutor(executor);
+            logger.info("Vocab size: " + word2idx.size());
+            logger.info("Words in train file: " + trainWordsCount);
+            logger.info("success train over! take time:{}ms.", System.currentTimeMillis() - startTime);
+
+        }
+    }
 }

@@ -1,28 +1,17 @@
 package me.mikusugar.word2vec;
 
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class SkipGram extends Word2Vec
 {
-    private static final Logger logger = LoggerFactory.getLogger(SkipGram.class);
 
     public SkipGram()
     {
 
     }
 
-    private void tranLine(String line)
+    @Override
+    protected void tranLine(String line)
     {
         String[] strs = line.split("[\\s　]+");
         wordCount.addAndGet(strs.length);
@@ -31,39 +20,6 @@ public class SkipGram extends Word2Vec
         for (int index = 0; index < sentence.size(); index++)
         {
             skipGram(index, sentence, random.nextInt(window));
-        }
-    }
-
-    private void trainModel(File file, int threads) throws IOException, InterruptedException
-    {
-        final long startTime = System.currentTimeMillis();
-        this.alpha = startingAlpha;
-        // @formatter:off
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(threads, threads, 5, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(threads * 3), new ThreadPoolExecutor.CallerRunsPolicy());
-        // @formatter:on
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(file.toPath()))))
-        {
-            wordCount.set(0);
-            lastWordCount = 0;
-            wordCountActual = 0;
-            while (br.ready())
-            {
-                updateLearRate();
-                final String line = br.readLine();
-                executor.execute(() -> tranLine(line));
-            }
-            // 关闭线程池
-            executor.shutdown();
-
-            // 等待所有任务执行完成
-            //noinspection ResultOfMethodCallIgnored
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-
-            logger.info("Vocab size: " + word2idx.size());
-            logger.info("Words in train file: " + trainWordsCount);
-            logger.info("success train over! take time:{}ms.", System.currentTimeMillis() - startTime);
         }
     }
 
@@ -131,19 +87,6 @@ public class SkipGram extends Word2Vec
                 syn1[target][i] += g * syn0[input][i];
             }
         }
-    }
-
-    @Override
-    public void fitFile(String filePath, int threads) throws Exception
-    {
-        File file = new File(filePath);
-        validateInputs(threads, file);
-
-        createExpTable();
-        readVocab(file);
-        initNet();
-        initNegative();
-        trainModel(file, threads);
     }
 
 }
