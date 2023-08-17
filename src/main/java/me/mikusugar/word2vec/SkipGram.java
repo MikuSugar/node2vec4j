@@ -1,6 +1,5 @@
 package me.mikusugar.word2vec;
 
-import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +124,7 @@ public class SkipGram extends Word2Vec
                 }
                 label = 0;
             }
-            final double g = getGradient(input, target, label);
+            final double g = getGradient(syn0[input], syn1[target], label);
             for (int i = 0; i < layerSize; i++)
             {
                 neu1e[i] += g * syn1[target][i];
@@ -138,8 +137,7 @@ public class SkipGram extends Word2Vec
     public void fitFile(String filePath, int threads) throws Exception
     {
         File file = new File(filePath);
-        Preconditions.checkArgument(file.isFile());
-        Preconditions.checkArgument(threads >= 1);
+        validateInputs(threads, file);
 
         createExpTable();
         readVocab(file);

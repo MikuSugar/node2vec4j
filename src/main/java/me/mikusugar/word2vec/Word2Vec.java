@@ -121,9 +121,9 @@ public abstract class Word2Vec
         return sentence;
     }
 
-    protected double getGradient(int input, int target, int label)
+    protected double getGradient(double[] vec1, double[] vec2, int label)
     {
-        double f = VectorUtils.dot(syn0[input], syn1[target]);
+        double f = VectorUtils.dot(vec1, vec2);
         double g;
         if (f > MAX_EXP)
         {
@@ -288,6 +288,12 @@ public abstract class Word2Vec
     public void setNegative(int negative)
     {
         this.negative = negative;
+    }
+
+    protected static void validateInputs(int threads, File file)
+    {
+        Preconditions.checkArgument(file.isFile());
+        Preconditions.checkArgument(threads >= 1);
     }
 
 }
