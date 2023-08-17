@@ -112,8 +112,15 @@ public class Node2VecLearn
         {
             if (tempFile != null)
             {
-                tempFile.delete();
-                logger.info("delete temp file {}.", tempFile.getAbsolutePath());
+                final boolean delete = tempFile.delete();
+                if (delete)
+                {
+                    logger.info("delete temp file {}.", tempFile.getAbsolutePath());
+                }
+                else
+                {
+                    logger.warn("delete temp file filed {}.", tempFile.getAbsolutePath());
+                }
             }
         }
     }
