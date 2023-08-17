@@ -18,7 +18,7 @@ public class SKipGramTest
 {
     private final static String corpusModelName = "corpus.emb";
 
-    private static final Logger logger = LoggerFactory.getLogger(SkipGram.class);
+    private static final Logger logger = LoggerFactory.getLogger(SKipGramTest.class);
 
     @Test
     public void testFitAndSaveBinaryModel() throws Exception

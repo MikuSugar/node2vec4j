@@ -2,6 +2,7 @@ package me.mikusugar.node2vec;
 
 import me.mikusugar.HelpTestUtils;
 import me.mikusugar.word2vec.LoadModel;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class Node2VecTest
 {
     private final String karateModelPath = "karate_model.emb";
 
-    @Test
+    @Before
     public void learnKarateTest() throws Exception
     {
         final String path = HelpTestUtils.getResourcePath() + "/karate.edgelist";

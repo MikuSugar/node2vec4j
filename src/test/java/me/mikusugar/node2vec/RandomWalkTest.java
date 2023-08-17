@@ -1,5 +1,7 @@
 package me.mikusugar.node2vec;
 
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +12,8 @@ import java.util.List;
  */
 public class RandomWalkTest
 {
-    public static void main(String[] args)
+    @Test
+    public void testRandomWalk()
     {
         final Graph graph = creatGraph();
         RandomWalk randomWalk = new RandomWalk(1, 1, 5, 10, graph);
