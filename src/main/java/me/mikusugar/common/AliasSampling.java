@@ -3,6 +3,7 @@ package me.mikusugar.common;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author mikusugar
@@ -17,14 +18,12 @@ public class AliasSampling
 
     private final double[] q;
 
-    private final Random random;
 
     public AliasSampling(int[] nodes, int[] weights)
     {
         this.nodes = nodes;
         this.j = new int[nodes.length];
         this.q = new double[nodes.length];
-        this.random = new Random();
         //归一化
         final double[] probability = normalization(weights);
 
@@ -36,7 +35,6 @@ public class AliasSampling
         this.nodes = nodes;
         this.j = new int[nodes.length];
         this.q = new double[nodes.length];
-        this.random = new Random();
         //归一化
         final double[] probability = normalization(weights);
 
@@ -105,8 +103,8 @@ public class AliasSampling
     private int aliasDraw()
     {
         int k = j.length;
-        int kk = random.nextInt(k);
-        if (random.nextDouble() < q[kk])
+        int kk = ThreadLocalRandom.current().nextInt(k);
+        if (ThreadLocalRandom.current().nextDouble() < q[kk])
         {
             return kk;
         }

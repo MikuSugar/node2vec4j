@@ -2,6 +2,8 @@ package me.mikusugar.word2vec;
 
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * @description CBOW
  * @author mikusugar
@@ -18,7 +20,7 @@ public class CBOW extends Word2Vec
         final IntList sentence = getSentence(strs);
         for (int inputWordIdx = 0; inputWordIdx < sentence.size(); inputWordIdx++)
         {
-            cbow(inputWordIdx, sentence, random.nextInt(window));
+            cbow(inputWordIdx, sentence, ThreadLocalRandom.current().nextInt(window));
         }
     }
 

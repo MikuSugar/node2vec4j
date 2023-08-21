@@ -2,6 +2,8 @@ package me.mikusugar.word2vec;
 
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class SkipGram extends Word2Vec
 {
 
@@ -19,7 +21,7 @@ public class SkipGram extends Word2Vec
 
         for (int index = 0; index < sentence.size(); index++)
         {
-            skipGram(index, sentence, random.nextInt(window));
+            skipGram(index, sentence, ThreadLocalRandom.current().nextInt(window));
         }
     }
 

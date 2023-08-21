@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,7 +64,7 @@ public abstract class Word2Vec
 
     protected int negative = 5;
 
-    protected final Random random = new Random();
+
 
     protected AliasSampling negativeSampling;
 
@@ -114,7 +114,7 @@ public abstract class Word2Vec
                 double ran = (Math.sqrt(idx2Word.get(idx).getCount() * 1.0 / (sample * trainWordsCount)) + 1)
                         * (sample * trainWordsCount) / idx2Word.get(idx).getCount();
                 // @formatter:on
-                if (ran < random.nextDouble())
+                if (ran < ThreadLocalRandom.current().nextDouble())
                 {
                     continue;
                 }
@@ -208,7 +208,7 @@ public abstract class Word2Vec
         {
             for (int j = 0; j < syn0[i].length; j++)
             {
-                syn0[i][j] = (random.nextDouble() - 0.5) / layerSize;
+                syn0[i][j] = (ThreadLocalRandom.current().nextDouble() - 0.5) / layerSize;
             }
         }
     }
