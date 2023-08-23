@@ -73,7 +73,7 @@ public abstract class Word2Vec
 
     }
 
-    protected LongAdder wordCount = new LongAdder();
+    protected int[] wordCount = null;
 
     protected int lastWordCount = 0;
 
@@ -81,7 +81,12 @@ public abstract class Word2Vec
 
     protected void updateLearRate()
     {
-        int wordCount = (int)this.wordCount.sum();
+        int wordCount = 0;
+        for (int wc : this.wordCount)
+        {
+            wordCount += wc;
+        }
+
         if (wordCount - lastWordCount > 10000)
         {
             logger.info("alpha: {},Progress: {}%", alpha,
@@ -196,7 +201,77 @@ public abstract class Word2Vec
         readVocab(file);
         initNet();
         initNegative();
-        trainModel(file, threads);
+        train(filePath, threads);
+
+    }
+
+    private void train(String filePath, int threads) throws IOException, InterruptedException
+    {
+        File[] files = null;
+        try
+        {
+            files = cutFile(filePath, threads);
+            trainModel(files, threads);
+        }
+        finally
+        {
+            clear(files);
+        }
+    }
+
+    private static void clear(File[] files)
+    {
+        if (files == null)
+        {
+            return;
+        }
+        for (File f : files)
+        {
+            if (f == null || !f.exists())
+            {
+                continue;
+            }
+            if (!f.delete())
+            {
+                logger.warn("delete file failed {}", f.getAbsolutePath());
+            }
+            else
+            {
+                logger.info("delete file success {}", f.getAbsolutePath());
+            }
+        }
+    }
+
+    private File[] cutFile(String filePath, int number) throws IOException
+    {
+        logger.info("start cut file...");
+        final long startTime = System.currentTimeMillis();
+        final File[] files = new File[number];
+        final Writer[] writes = new Writer[number];
+        for (int i = 0; i < number; i++)
+        {
+            files[i] = File.createTempFile("node2vec4j_tmp_" + i + "_", ".txt");
+            writes[i] = new BufferedWriter(new FileWriter(files[i]));
+            logger.info("create tmp file {}", files[i].getAbsolutePath());
+        }
+        int count = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath), 1024 * 1024))
+        {
+
+            while (reader.ready())
+            {
+                Writer writer = writes[count++ % number];
+                writer.write(reader.readLine());
+                writer.write(System.lineSeparator());
+            }
+        }
+        for (Writer write : writes)
+        {
+            write.flush();
+            write.close();
+        }
+        logger.info("cut file success,take time:{}ms", System.currentTimeMillis() - startTime);
+        return files;
     }
 
     protected void initNet()
@@ -315,7 +390,7 @@ public abstract class Word2Vec
         this.power = power;
     }
 
-    protected abstract void tranLine(String line);
+    protected abstract void tranLine(String line, int id);
 
     protected static void shutdownThreadPoolExecutor(ThreadPoolExecutor executor) throws InterruptedException
     {
@@ -326,9 +401,9 @@ public abstract class Word2Vec
         logger.info("shutdown thread pool success.");
     }
 
-    protected void resetWordCount()
+    protected void resetWordCount(int threads)
     {
-        wordCount.reset();
+        wordCount = new int[threads];
         lastWordCount = 0;
         wordCountActual = 0;
     }
@@ -340,27 +415,45 @@ public abstract class Word2Vec
                 new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
-    protected void trainModel(File file, int threads) throws IOException, InterruptedException
+    protected void trainModel(File[] files, int threads) throws InterruptedException
     {
         final long startTime = System.currentTimeMillis();
         this.alpha = startingAlpha;
 
         final ThreadPoolExecutor executor = createThreadPoolExecutor(threads);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file), 1024 * 1024))
-        {
-            resetWordCount();
-            while (br.ready())
-            {
-                updateLearRate();
-                final String line = br.readLine();
-                executor.execute(() -> tranLine(line));
-            }
-            shutdownThreadPoolExecutor(executor);
-            logger.info("Vocab size: " + word2idx.size());
-            logger.info("Words in train file: " + trainWordsCount);
-            logger.info("success train over! take time:{}ms.", System.currentTimeMillis() - startTime);
+        resetWordCount(threads);
 
+        for (int i = 0; i < threads; i++)
+        {
+            final int id = i;
+            executor.execute(() ->
+            {
+                logger.info("thread {} start tran...", id);
+                final long threadStartTime = System.currentTimeMillis();
+                try (BufferedReader reader = new BufferedReader(new FileReader(files[id]), 1024 * 1024))
+                {
+                    while (reader.ready())
+                    {
+                        if (id == 0)
+                        {
+                            updateLearRate();
+                        }
+                        tranLine(reader.readLine(), id);
+                    }
+                    logger.info("thread {} success train over! take time:{}ms", id,
+                            System.currentTimeMillis() - threadStartTime);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            });
         }
+        shutdownThreadPoolExecutor(executor);
+        logger.info("Vocab size: " + word2idx.size());
+        logger.info("Words in train file: " + trainWordsCount);
+        logger.info("success train over! take time:{}ms.", System.currentTimeMillis() - startTime);
+
     }
 }

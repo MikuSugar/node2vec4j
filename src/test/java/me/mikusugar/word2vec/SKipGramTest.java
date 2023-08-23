@@ -28,7 +28,7 @@ public class SKipGramTest
         skipGram.setLayerSize(300);
         skipGram.setMAX_EXP(10);
         skipGram.setNegative(10);
-        skipGram.fitFile(corpusFilePath, Math.max(HelpTestUtils.getCPUCores() - 1, 1));
+        skipGram.fitFile(corpusFilePath, Math.max(HelpTestUtils.getCPUCores(), 1));
         skipGram.saveBinaryModel(corpusModelName);
     }
 

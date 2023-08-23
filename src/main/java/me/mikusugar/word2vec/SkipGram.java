@@ -13,10 +13,10 @@ public class SkipGram extends Word2Vec
     }
 
     @Override
-    protected void tranLine(String line)
+    protected void tranLine(String line, int id)
     {
         String[] strs = line.split("[\\s　]+");
-        wordCount.add(strs.length);
+        wordCount[id] += strs.length;
         final IntList sentence = getSentence(strs);
 
         for (int index = 0; index < sentence.size(); index++)

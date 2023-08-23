@@ -13,10 +13,10 @@ public class CBOW extends Word2Vec
 {
 
     @Override
-    protected void tranLine(String line)
+    protected void tranLine(String line, int id)
     {
         String[] strs = line.split("[\\s　]+");
-        wordCount.add(strs.length);
+        wordCount[id] += strs.length;
         final IntList sentence = getSentence(strs);
         for (int inputWordIdx = 0; inputWordIdx < sentence.size(); inputWordIdx++)
         {
