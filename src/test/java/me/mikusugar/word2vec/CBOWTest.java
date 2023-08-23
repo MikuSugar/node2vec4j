@@ -30,7 +30,7 @@ public class CBOWTest
         cbow.setNegative(10);
         cbow.setAlpha(0.05);
         cbow.setSample(1e-3);
-        cbow.fitFile(corpusFilePath, 8);
+        cbow.fitFile(corpusFilePath, Math.max(HelpTestUtils.getCPUCores() - 1, 1));
         cbow.saveBinaryModel(corpusModelName);
     }
 

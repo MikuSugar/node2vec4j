@@ -64,7 +64,7 @@ public abstract class Word2Vec
 
     protected int negative = 5;
 
-
+    protected double power = 0.75;
 
     protected AliasSampling negativeSampling;
 
@@ -243,13 +243,13 @@ public abstract class Word2Vec
         logger.info("init negative...");
         final long startTime = System.currentTimeMillis();
         int[] nodes = new int[idx2Word.size()];
-        int[] count = new int[idx2Word.size()];
+        double[] weight = new double[idx2Word.size()];
         for (int i = 0; i < idx2Word.size(); i++)
         {
             nodes[i] = i;
-            count[i] = idx2Word.get(i).getCount();
+            weight[i] = Math.pow(idx2Word.get(i).getCount(), power);
         }
-        this.negativeSampling = new AliasSampling(nodes, count);
+        this.negativeSampling = new AliasSampling(nodes, weight);
         logger.info("init negative success! take time:{}ms.", System.currentTimeMillis() - startTime);
     }
 
@@ -308,6 +308,11 @@ public abstract class Word2Vec
     {
         Preconditions.checkArgument(file.isFile());
         Preconditions.checkArgument(threads >= 1);
+    }
+
+    public void setPower(double power)
+    {
+        this.power = power;
     }
 
     protected abstract void tranLine(String line);

@@ -15,4 +15,9 @@ public class HelpTestUtils
         Path resourceDirectory = Paths.get("src", "test", "resources");
         return resourceDirectory.toFile().getAbsolutePath();
     }
+
+    public static int getCPUCores()
+    {
+        return Runtime.getRuntime().availableProcessors();
+    }
 }
