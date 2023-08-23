@@ -1,5 +1,7 @@
 package me.mikusugar.node2vec;
 
+import it.unimi.dsi.fastutil.ints.*;
+
 import java.util.*;
 
 /**
@@ -9,14 +11,14 @@ import java.util.*;
  */
 public class Graph
 {
-    private final Set<Integer> nodes;
+    private final IntSet nodes;
 
-    private final Map<Integer, List<int[]>> edges;
+    private final Int2ObjectMap<List<int[]>> edges;
 
     public Graph()
     {
-        this.nodes = new HashSet<>();
-        this.edges = new HashMap<>();
+        this.nodes = new IntOpenHashSet();
+        this.edges = new Int2ObjectOpenHashMap<>();
     }
 
     public void addNode(int vid)
@@ -24,7 +26,7 @@ public class Graph
         nodes.add(vid);
     }
 
-    public Collection<Integer> nodes()
+    public IntCollection nodes()
     {
         return nodes;
     }

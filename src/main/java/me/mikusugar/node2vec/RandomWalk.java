@@ -2,6 +2,8 @@ package me.mikusugar.node2vec;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import me.mikusugar.common.AliasSampling;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +74,7 @@ public class RandomWalk
         final List<int[]> res = new ArrayList<>();
         for (int i = 0; i < numWalks; i++)
         {
-            List<Integer> nodes = new ArrayList<>(graph.nodes());
+            IntList nodes = new IntArrayList(graph.nodes());
             Collections.shuffle(nodes);
             for (int node : nodes)
             {
