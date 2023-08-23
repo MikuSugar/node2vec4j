@@ -16,7 +16,7 @@ public class CBOW extends Word2Vec
     protected void tranLine(String line)
     {
         String[] strs = line.split("[\\s　]+");
-        wordCount.addAndGet(strs.length);
+        wordCount.add(strs.length);
         final IntList sentence = getSentence(strs);
         for (int inputWordIdx = 0; inputWordIdx < sentence.size(); inputWordIdx++)
         {

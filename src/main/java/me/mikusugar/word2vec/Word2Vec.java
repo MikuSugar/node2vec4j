@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * @description
@@ -73,7 +73,7 @@ public abstract class Word2Vec
 
     }
 
-    protected AtomicInteger wordCount = new AtomicInteger(0);
+    protected LongAdder wordCount = new LongAdder();
 
     protected int lastWordCount = 0;
 
@@ -81,7 +81,7 @@ public abstract class Word2Vec
 
     protected void updateLearRate()
     {
-        int wordCount = this.wordCount.get();
+        int wordCount = (int)this.wordCount.sum();
         if (wordCount - lastWordCount > 10000)
         {
             logger.info("alpha: {},Progress: {}%", alpha,
@@ -328,7 +328,7 @@ public abstract class Word2Vec
 
     protected void resetWordCount()
     {
-        wordCount.set(0);
+        wordCount.reset();
         lastWordCount = 0;
         wordCountActual = 0;
     }
@@ -347,7 +347,7 @@ public abstract class Word2Vec
 
         final ThreadPoolExecutor executor = createThreadPoolExecutor(threads);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file)))
+        try (BufferedReader br = new BufferedReader(new FileReader(file), 1024 * 1024))
         {
             resetWordCount();
             while (br.ready())
