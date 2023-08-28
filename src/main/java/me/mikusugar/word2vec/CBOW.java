@@ -12,6 +12,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CBOW extends Word2Vec
 {
 
+    public CBOW()
+    {
+        super("CBOW");
+    }
+
     @Override
     protected void tranLine(String line, int id)
     {

@@ -10,6 +10,7 @@ public class SkipGram extends Word2Vec
     public SkipGram()
     {
 
+        super("SKIP-GRAM");
     }
 
     @Override

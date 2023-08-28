@@ -29,6 +29,8 @@ public abstract class Word2Vec
 {
     private static final Logger logger = LoggerFactory.getLogger(Word2Vec.class);
 
+    private final String modelName;
+
     protected Object2IntMap<String> word2idx;
 
     protected ObjectList<Word> idx2Word;
@@ -67,9 +69,10 @@ public abstract class Word2Vec
 
     protected AliasSampling negativeSampling;
 
-    public Word2Vec()
+    public Word2Vec(String modelName)
     {
 
+        this.modelName = modelName;
     }
 
     protected int[] wordCount = null;
@@ -88,7 +91,7 @@ public abstract class Word2Vec
 
         if (wordCount - lastWordCount > 10000)
         {
-            logger.info("alpha: {},Progress: {}%", alpha,
+            logger.info("model:{},alpha: {},Progress: {}%", modelName, alpha,
                     String.format("%.4f", (wordCountActual / (double)(trainWordsCount)) * 100));
 
             wordCountActual += wordCount - lastWordCount;
