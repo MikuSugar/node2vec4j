@@ -19,7 +19,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * @description
@@ -255,7 +254,7 @@ public abstract class Word2Vec
             logger.info("create tmp file {}", files[i].getAbsolutePath());
         }
         int count = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath), 1024 * 1024))
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath)))
         {
 
             while (reader.ready())
@@ -431,7 +430,7 @@ public abstract class Word2Vec
             {
                 logger.info("thread {} start tran...", id);
                 final long threadStartTime = System.currentTimeMillis();
-                try (BufferedReader reader = new BufferedReader(new FileReader(files[id]), 1024 * 1024))
+                try (BufferedReader reader = new BufferedReader(new FileReader(files[id])))
                 {
                     while (reader.ready())
                     {
